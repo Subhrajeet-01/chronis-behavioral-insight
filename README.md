@@ -1,5 +1,7 @@
 # Chronis Behavioral Insight Engine
 
+> **Live Dashboard**: [https://subhrajeet-01.github.io/chronis-behavioral-insight/](https://subhrajeet-01.github.io/chronis-behavioral-insight/)
+
 The Chronis Behavioral Insight Engine is a long-horizon behavioral analysis system designed to analyze personal metric logs (steps, sleep, screen time, deep work focus, and physical exercise) and generate actionable, evidence-backed insights.
 
 ---
