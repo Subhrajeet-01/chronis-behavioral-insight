@@ -1,0 +1,398 @@
+{
+  "insights": {
+    "U4": [
+      {
+        "type": "pattern",
+        "insight": "Deep work focus hours decreased.",
+        "confidence": 0.73,
+        "evidence": "Average daily focus changed from 3.8 to 1.9 hours (-50.0%).",
+        "metric": "deep_work_hours",
+        "date": null,
+        "details": {
+          "baseline_mean": 3.8,
+          "current_mean": 1.9,
+          "cohens_d": -1.3100204461653029
+        }
+      },
+      {
+        "type": "anomaly",
+        "insight": "Anomaly detected on 2026-01-06: Deep work focus drop.",
+        "confidence": 0.99,
+        "evidence": "Deep work hours were 0.7 hours (rolling average: 4.4 hours, deviation: -5.3\u03c3).",
+        "metric": "deep_work_hours",
+        "date": "2026-01-06",
+        "details": {
+          "value": 0.7,
+          "rolling_mean": 4.42,
+          "rolling_std": 0.697853852894716,
+          "z_score": -5.3306290200582005
+        }
+      },
+      {
+        "type": "anomaly",
+        "insight": "Anomaly detected on 2026-01-13: Deep work focus drop.",
+        "confidence": 0.74,
+        "evidence": "Deep work hours were 0.8 hours (rolling average: 3.7 hours, deviation: -2.2\u03c3).",
+        "metric": "deep_work_hours",
+        "date": "2026-01-13",
+        "details": {
+          "value": 0.8,
+          "rolling_mean": 3.6999999999999997,
+          "rolling_std": 1.2926364883094903,
+          "z_score": -2.2434768213858938
+        }
+      },
+      {
+        "type": "anomaly",
+        "insight": "Anomaly detected on 2026-01-22: Deep work focus drop.",
+        "confidence": 0.74,
+        "evidence": "Deep work hours were 0.7 hours (rolling average: 3.9 hours, deviation: -2.3\u03c3).",
+        "metric": "deep_work_hours",
+        "date": "2026-01-22",
+        "details": {
+          "value": 0.7,
+          "rolling_mean": 3.9285714285714284,
+          "rolling_std": 1.4046234488171676,
+          "z_score": -2.2985316322963327
+        }
+      }
+    ],
+    "U1": [
+      {
+        "type": "anomaly",
+        "insight": "Anomaly detected on 2026-01-07: Slept longer than usual.",
+        "confidence": 0.85,
+        "evidence": "Sleep duration was 8.2 hours (rolling average: 6.5 hours, deviation: +3.0\u03c3).",
+        "metric": "sleep_hours",
+        "date": "2026-01-07",
+        "details": {
+          "value": 8.2,
+          "rolling_mean": 6.466666666666666,
+          "rolling_std": 0.5819507424745385,
+          "z_score": 2.9784880520350403
+        }
+      },
+      {
+        "type": "anomaly",
+        "insight": "Anomaly detected on 2026-01-14: Deep work focus drop.",
+        "confidence": 0.74,
+        "evidence": "Deep work hours were 0.6 hours (rolling average: 4.1 hours, deviation: -2.3\u03c3).",
+        "metric": "deep_work_hours",
+        "date": "2026-01-14",
+        "details": {
+          "value": 0.6,
+          "rolling_mean": 4.138461538461538,
+          "rolling_std": 1.5516327215433756,
+          "z_score": -2.280476229543488
+        }
+      },
+      {
+        "type": "anomaly",
+        "insight": "Anomaly detected on 2026-01-07: Significant decline in steps.",
+        "confidence": 0.73,
+        "evidence": "Steps reached 4,134 (rolling average: 8,993, deviation: -2.2\u03c3).",
+        "metric": "steps",
+        "date": "2026-01-07",
+        "details": {
+          "value": 4134.0,
+          "rolling_mean": 8992.833333333334,
+          "rolling_std": 2181.475960597931,
+          "z_score": -2.2273146351800976
+        }
+      },
+      {
+        "type": "anomaly",
+        "insight": "Anomaly detected on 2026-01-20: Deep work focus drop.",
+        "confidence": 0.73,
+        "evidence": "Deep work hours were 1.0 hours (rolling average: 4.4 hours, deviation: -2.2\u03c3).",
+        "metric": "deep_work_hours",
+        "date": "2026-01-20",
+        "details": {
+          "value": 1.0,
+          "rolling_mean": 4.385714285714285,
+          "rolling_std": 1.5619795836630577,
+          "z_score": -2.167579090742222
+        }
+      },
+      {
+        "type": "anomaly",
+        "insight": "Anomaly detected on 2026-01-30: Severe sleep restriction.",
+        "confidence": 0.73,
+        "evidence": "Sleep duration was 5.5 hours (rolling average: 7.3 hours, deviation: -2.2\u03c3).",
+        "metric": "sleep_hours",
+        "date": "2026-01-30",
+        "details": {
+          "value": 5.5,
+          "rolling_mean": 7.307142857142857,
+          "rolling_std": 0.833402927496922,
+          "z_score": -2.16839033979699
+        }
+      },
+      {
+        "type": "anomaly",
+        "insight": "Anomaly detected on 2026-01-08: Unusually low screen time.",
+        "confidence": 0.72,
+        "evidence": "Screen time was 2.8 hours (rolling average: 7.0 hours, deviation: -2.1\u03c3).",
+        "metric": "screen_time_hours",
+        "date": "2026-01-08",
+        "details": {
+          "value": 2.8,
+          "rolling_mean": 7.0,
+          "rolling_std": 1.9941581348194697,
+          "z_score": -2.1061519278059784
+        }
+      }
+    ],
+    "U2": [
+      {
+        "type": "anomaly",
+        "insight": "Anomaly detected on 2026-01-06: High productivity day.",
+        "confidence": 0.99,
+        "evidence": "Deep work hours were 6.0 hours (rolling average: 1.6 hours, deviation: +5.0\u03c3).",
+        "metric": "deep_work_hours",
+        "date": "2026-01-06",
+        "details": {
+          "value": 6.0,
+          "rolling_mean": 1.6,
+          "rolling_std": 0.8860022573334675,
+          "z_score": 4.966127302251284
+        }
+      },
+      {
+        "type": "anomaly",
+        "insight": "Anomaly detected on 2026-01-07: Severe sleep restriction.",
+        "confidence": 0.78,
+        "evidence": "Sleep duration was 6.0 hours (rolling average: 7.8 hours, deviation: -2.5\u03c3).",
+        "metric": "sleep_hours",
+        "date": "2026-01-07",
+        "details": {
+          "value": 6.0,
+          "rolling_mean": 7.783333333333334,
+          "rolling_std": 0.7054549359574055,
+          "z_score": -2.527919562874828
+        }
+      },
+      {
+        "type": "anomaly",
+        "insight": "Anomaly detected on 2026-01-10: Significant decline in steps.",
+        "confidence": 0.78,
+        "evidence": "Steps reached 4,362 (rolling average: 9,196, deviation: -2.5\u03c3).",
+        "metric": "steps",
+        "date": "2026-01-10",
+        "details": {
+          "value": 4362.0,
+          "rolling_mean": 9196.222222222223,
+          "rolling_std": 1921.9141355545632,
+          "z_score": -2.515316440412839
+        }
+      },
+      {
+        "type": "anomaly",
+        "insight": "Anomaly detected on 2026-01-29: Unusually low physical exercise.",
+        "confidence": 0.78,
+        "evidence": "Exercise minutes were 4 mins (rolling average: 59 mins, deviation: -2.5\u03c3).",
+        "metric": "exercise_minutes",
+        "date": "2026-01-29",
+        "details": {
+          "value": 4.0,
+          "rolling_mean": 58.642857142857146,
+          "rolling_std": 21.56424085184738,
+          "z_score": -2.53395691127128
+        }
+      },
+      {
+        "type": "anomaly",
+        "insight": "Anomaly detected on 2026-01-06: Intense exercise session.",
+        "confidence": 0.77,
+        "evidence": "Exercise minutes were 87 mins (rolling average: 33 mins, deviation: +2.5\u03c3).",
+        "metric": "exercise_minutes",
+        "date": "2026-01-06",
+        "details": {
+          "value": 87.0,
+          "rolling_mean": 32.6,
+          "rolling_std": 21.824298385056963,
+          "z_score": 2.492634541564348
+        }
+      },
+      {
+        "type": "anomaly",
+        "insight": "Anomaly detected on 2026-01-23: Deep work focus drop.",
+        "confidence": 0.77,
+        "evidence": "Deep work hours were 0.7 hours (rolling average: 4.0 hours, deviation: -2.4\u03c3).",
+        "metric": "deep_work_hours",
+        "date": "2026-01-23",
+        "details": {
+          "value": 0.7,
+          "rolling_mean": 4.021428571428571,
+          "rolling_std": 1.3644827543113864,
+          "z_score": -2.4342034085324857
+        }
+      }
+    ],
+    "U3": [
+      {
+        "type": "anomaly",
+        "insight": "Anomaly detected on 2026-01-13: Slept longer than usual.",
+        "confidence": 0.87,
+        "evidence": "Sleep duration was 8.2 hours (rolling average: 6.4 hours, deviation: +3.1\u03c3).",
+        "metric": "sleep_hours",
+        "date": "2026-01-13",
+        "details": {
+          "value": 8.2,
+          "rolling_mean": 6.383333333333333,
+          "rolling_std": 0.5843929769557052,
+          "z_score": 3.108638772714688
+        }
+      },
+      {
+        "type": "anomaly",
+        "insight": "Anomaly detected on 2026-01-08: Unusually low physical exercise.",
+        "confidence": 0.76,
+        "evidence": "Exercise minutes were 11 mins (rolling average: 53 mins, deviation: -2.4\u03c3).",
+        "metric": "exercise_minutes",
+        "date": "2026-01-08",
+        "details": {
+          "value": 11.0,
+          "rolling_mean": 52.714285714285715,
+          "rolling_std": 17.28886236583431,
+          "z_score": -2.412783723509775
+        }
+      },
+      {
+        "type": "anomaly",
+        "insight": "Anomaly detected on 2026-01-11: Unusually low physical exercise.",
+        "confidence": 0.73,
+        "evidence": "Exercise minutes were 5 mins (rolling average: 50 mins, deviation: -2.2\u03c3).",
+        "metric": "exercise_minutes",
+        "date": "2026-01-11",
+        "details": {
+          "value": 5.0,
+          "rolling_mean": 49.8,
+          "rolling_std": 20.351358131038275,
+          "z_score": -2.201327287915719
+        }
+      },
+      {
+        "type": "anomaly",
+        "insight": "Anomaly detected on 2026-01-12: Deep work focus drop.",
+        "confidence": 0.73,
+        "evidence": "Deep work hours were 1.0 hours (rolling average: 4.0 hours, deviation: -2.2\u03c3).",
+        "metric": "deep_work_hours",
+        "date": "2026-01-12",
+        "details": {
+          "value": 1.0,
+          "rolling_mean": 3.9909090909090907,
+          "rolling_std": 1.3590103351001752,
+          "z_score": -2.2007993711752203
+        }
+      },
+      {
+        "type": "anomaly",
+        "insight": "Anomaly detected on 2026-01-13: Significant decline in steps.",
+        "confidence": 0.73,
+        "evidence": "Steps reached 4,291 (rolling average: 8,131, deviation: -2.2\u03c3).",
+        "metric": "steps",
+        "date": "2026-01-13",
+        "details": {
+          "value": 4291.0,
+          "rolling_mean": 8130.833333333333,
+          "rolling_std": 1771.1353745977508,
+          "z_score": -2.168006685658013
+        }
+      },
+      {
+        "type": "anomaly",
+        "insight": "Anomaly detected on 2026-01-17: Slept longer than usual.",
+        "confidence": 0.73,
+        "evidence": "Sleep duration was 8.5 hours (rolling average: 6.7 hours, deviation: +2.2\u03c3).",
+        "metric": "sleep_hours",
+        "date": "2026-01-17",
+        "details": {
+          "value": 8.5,
+          "rolling_mean": 6.7,
+          "rolling_std": 0.8218178723930352,
+          "z_score": 2.1902663113891836
+        }
+      },
+      {
+        "type": "anomaly",
+        "insight": "Anomaly detected on 2026-01-23: Intense exercise session.",
+        "confidence": 0.73,
+        "evidence": "Exercise minutes were 86 mins (rolling average: 37 mins, deviation: +2.2\u03c3).",
+        "metric": "exercise_minutes",
+        "date": "2026-01-23",
+        "details": {
+          "value": 86.0,
+          "rolling_mean": 36.57142857142857,
+          "rolling_std": 22.400941895424797,
+          "z_score": 2.2065398704804817
+        }
+      },
+      {
+        "type": "anomaly",
+        "insight": "Anomaly detected on 2026-01-15: Slept longer than usual.",
+        "confidence": 0.72,
+        "evidence": "Sleep duration was 8.1 hours (rolling average: 6.5 hours, deviation: +2.1\u03c3).",
+        "metric": "sleep_hours",
+        "date": "2026-01-15",
+        "details": {
+          "value": 8.1,
+          "rolling_mean": 6.542857142857143,
+          "rolling_std": 0.7271803138088987,
+          "z_score": 2.141343525908583
+        }
+      },
+      {
+        "type": "anomaly",
+        "insight": "Anomaly detected on 2026-01-11: Unusual step count detected.",
+        "confidence": 0.71,
+        "evidence": "Steps reached 11,208 (rolling average: 8,008, deviation: +2.1\u03c3).",
+        "metric": "steps",
+        "date": "2026-01-11",
+        "details": {
+          "value": 11208.0,
+          "rolling_mean": 8008.5,
+          "rolling_std": 1543.8342779514185,
+          "z_score": 2.0724374666985352
+        }
+      },
+      {
+        "type": "anomaly",
+        "insight": "Anomaly detected on 2026-01-16: Deep work focus drop.",
+        "confidence": 0.71,
+        "evidence": "Deep work hours were 0.8 hours (rolling average: 3.9 hours, deviation: -2.1\u03c3).",
+        "metric": "deep_work_hours",
+        "date": "2026-01-16",
+        "details": {
+          "value": 0.8,
+          "rolling_mean": 3.864285714285714,
+          "rolling_std": 1.483554537566471,
+          "z_score": -2.0655025728357614
+        }
+      }
+    ],
+    "U5": [
+      {
+        "type": "anomaly",
+        "insight": "Anomaly detected on 2026-01-09: Unusually low physical exercise.",
+        "confidence": 0.8,
+        "evidence": "Exercise minutes were 7 mins (rolling average: 56 mins, deviation: -2.6\u03c3).",
+        "metric": "exercise_minutes",
+        "date": "2026-01-09",
+        "details": {
+          "value": 7.0,
+          "rolling_mean": 55.5,
+          "rolling_std": 18.35366837602616,
+          "z_score": -2.642523500280273
+        }
+      }
+    ]
+  },
+  "abstention_counts": {
+    "U3": 2,
+    "U5": 2,
+    "U1": 1,
+    "U4": 1,
+    "U2": 2
+  }
+}

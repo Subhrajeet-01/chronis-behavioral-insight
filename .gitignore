@@ -1,0 +1,17 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environment
+.venv/
+venv/
+ENV/
+
+# Test cache
+.pytest_cache/
+
+# User-specific / System files
+.DS_Store
+*.swp
+*.swo

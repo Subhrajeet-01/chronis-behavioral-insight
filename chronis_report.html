@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chronis — Behavioral Insight Engine</title>
+    <!-- Premium Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-color: #050507;
+            --card-bg: rgba(18, 18, 22, 0.75);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --text-primary: #f4f4f5;
+            --text-secondary: #a1a1aa;
+            --accent-green: #10b981;
+            --accent-green-glow: rgba(16, 185, 129, 0.15);
+            --accent-red: #ef4444;
+            --accent-red-glow: rgba(239, 68, 68, 0.15);
+            --accent-purple: #8b5cf6;
+            --accent-cyan: #06b6d4;
+            --accent-amber: #f59e0b;
+            --accent-amber-glow: rgba(245, 158, 11, 0.15);
+            --sidebar-width: 280px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar Navigation */
+        aside {
+            width: var(--sidebar-width);
+            border-right: 1px solid var(--card-border);
+            background: rgba(10, 10, 12, 0.95);
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 10;
+        }
+
+        .logo-container {
+            margin-bottom: 3rem;
+        }
+
+        .logo-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            background: linear-gradient(135deg, #ffffff 30%, #a1a1aa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-subtitle {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: var(--accent-purple);
+            margin-top: 0.2rem;
+            font-weight: 600;
+        }
+
+        .user-menu-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .user-tabs {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .user-tab {
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--text-secondary);
+            padding: 0.85rem 1.2rem;
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: left;
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .user-tab:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.03);
+            border-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .user-tab.active {
+            color: var(--text-primary);
+            background: rgba(139, 92, 246, 0.1);
+            border-color: rgba(139, 92, 246, 0.3);
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.05);
+        }
+
+        .user-tab .user-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--text-secondary);
+            transition: background-color 0.3s;
+        }
+
+        .user-tab.active .user-dot {
+            background-color: var(--accent-purple);
+            box-shadow: 0 0 8px var(--accent-purple);
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--card-border);
+            padding-top: 1.5rem;
+            line-height: 1.4;
+        }
+
+        /* Main Content Dashboard */
+        main {
+            margin-left: var(--sidebar-width);
+            flex-grow: 1;
+            padding: 2.5rem 3rem;
+            max-width: 1400px;
+        }
+
+        .header-section {
+            margin-bottom: 2.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .header-info h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .header-info p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .meta-badge {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--card-border);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* Stat Grid Cards */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 1.2rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 1.25rem;
+            backdrop-filter: blur(12px);
+            transition: transform 0.3s, border-color 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-desc {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        /* Grid Layout for Charts & Insights */
+        .dashboard-body {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .panel {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 1.75rem;
+            backdrop-filter: blur(12px);
+        }
+
+        .panel-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-subtitle {
+            font-size: 0.8rem;
+            font-weight: 400;
+            color: var(--text-secondary);
+        }
+
+        /* Charts Panel */
+        .charts-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 250px;
+            width: 100%;
+        }
+
+        /* Insights Panel */
+        .insights-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-height: 560px;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+        }
+
+        /* Custom scrollbar for insights list */
+        .insights-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        .insights-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .insights-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+        .insights-list::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .insight-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 14px;
+            padding: 1.2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            transition: all 0.3s;
+        }
+
+        .insight-card:hover {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .insight-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .insight-badge {
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+        }
+
+        .badge-trend-incline {
+            background-color: var(--accent-green-glow);
+            color: var(--accent-green);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .badge-trend-decline {
+            background-color: var(--accent-red-glow);
+            color: var(--accent-red);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .badge-anomaly {
+            background-color: var(--accent-amber-glow);
+            color: var(--accent-amber);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .confidence-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .confidence-bar-bg {
+            width: 60px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .confidence-bar-fill {
+            height: 100%;
+            background: var(--accent-purple);
+            border-radius: 10px;
+        }
+
+        .insight-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .insight-evidence {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            background: rgba(0, 0, 0, 0.15);
+            padding: 0.6rem 0.8rem;
+            border-radius: 8px;
+            border-left: 3px solid var(--accent-purple);
+        }
+
+        .empty-insights {
+            color: var(--text-secondary);
+            text-align: center;
+            padding: 3rem 0;
+            font-size: 0.9rem;
+        }
+
+        /* Custom evidence sufficiency style */
+        .sufficiency-panel {
+            background: rgba(139, 92, 246, 0.03);
+            border: 1px solid rgba(139, 92, 246, 0.1);
+            border-radius: 16px;
+            padding: 1.25rem 1.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.85rem;
+        }
+
+        .sufficiency-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .sufficiency-title span.icon {
+            display: inline-block;
+            background: rgba(139, 92, 246, 0.15);
+            color: var(--accent-purple);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 24px;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+
+        .sufficiency-desc {
+            color: var(--text-secondary);
+        }
+
+        .sufficiency-badge {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            color: var(--accent-purple);
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <aside>
+        <div class="logo-container">
+            <div class="logo-title">CHRONIS</div>
+            <div class="logo-subtitle">Insight Engine</div>
+        </div>
+        
+        <div class="user-menu-label">Preserved Profiles</div>
+        <div class="user-tabs" id="userTabs">
+            <!-- Tabs will be rendered here dynamically -->
+        </div>
+        
+        <div class="sidebar-footer">
+        </div>
+    </aside>
+
+    <!-- Main Dashboard -->
+    <main>
+        <div class="header-section">
+            <div class="header-info">
+                <h1 id="dashboardUserTitle">User Dashboard</h1>
+                <p>Synthesis of behavioral observations over a 30-day window.</p>
+            </div>
+            <div class="meta-badge" id="dataDaysBadge">
+                30 observations logged
+            </div>
+        </div>
+
+        <!-- Metrics Stats Grid -->
+        <div class="stat-grid" id="statGrid">
+            <!-- Stat cards will be dynamically rendered here -->
+        </div>
+
+        <!-- Charts and Insights Grid -->
+        <div class="dashboard-body">
+            <!-- Left Panel: Visual Trends -->
+            <div class="panel">
+                <div class="panel-title">
+                    Behavioral Timelines
+                    <span class="panel-subtitle">Interactive 30-day correlation charts</span>
+                </div>
+                <div class="charts-container">
+                    <div>
+                        <div style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Steps & Exercise Minutes</div>
+                        <div class="chart-wrapper">
+                            <canvas id="activityChart"></canvas>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Sleep Duration & Screen Time</div>
+                        <div class="chart-wrapper">
+                            <canvas id="sleepScreenChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel: Insights -->
+            <div class="panel">
+                <div class="panel-title">
+                    Evidence-Backed Insights
+                    <span class="panel-subtitle" id="insightCount">0 active claims</span>
+                </div>
+                <div class="insights-list" id="insightsList">
+                    <!-- Insight cards will be dynamically rendered here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Panel: Evidence Sufficiency (Abstention Engine summary) -->
+        <div class="sufficiency-panel">
+            <div class="sufficiency-title">
+                <span class="icon">i</span>
+                Evidence Safety Filter (Component 4)
+            </div>
+            <div class="sufficiency-desc">
+                To ensure accuracy, insights with weak evidence (less than 70% confidence) are hidden to prevent false conclusions.
+            </div>
+            <div class="sufficiency-badge" id="sufficiencyStatus">
+                0 insights withheld
+            </div>
+        </div>
+    </main>
+
+    <!-- Embedded JSON Data and Logic -->
+    <script>
+        // Data injected by Python template engine
+        const chronisData = [{"user_id": "U1", "date": "2026-01-01T00:00:00", "steps": 8587, "sleep_hours": 7.5, "screen_time_hours": 7.3, "deep_work_hours": 1.7, "exercise_minutes": 22}, {"user_id": "U1", "date": "2026-01-02T00:00:00", "steps": 9735, "sleep_hours": 6.4, "screen_time_hours": 7.6, "deep_work_hours": 1.9, "exercise_minutes": 63}, {"user_id": "U1", "date": "2026-01-03T00:00:00", "steps": 7658, "sleep_hours": 6.5, "screen_time_hours": 7.9, "deep_work_hours": 5.6, "exercise_minutes": 83}, {"user_id": "U1", "date": "2026-01-04T00:00:00", "steps": 10357, "sleep_hours": 6.4, "screen_time_hours": 7.7, "deep_work_hours": 3.9, "exercise_minutes": 10}, {"user_id": "U1", "date": "2026-01-05T00:00:00", "steps": 5698, "sleep_hours": 6.3, "screen_time_hours": 2.7, "deep_work_hours": 5.5, "exercise_minutes": 21}, {"user_id": "U1", "date": "2026-01-06T00:00:00", "steps": 11922, "sleep_hours": 5.7, "screen_time_hours": 6.9, "deep_work_hours": 5.5, "exercise_minutes": 87}, {"user_id": "U1", "date": "2026-01-07T00:00:00", "steps": 4134, "sleep_hours": 8.2, "screen_time_hours": 8.9, "deep_work_hours": 1.6, "exercise_minutes": 36}, {"user_id": "U1", "date": "2026-01-08T00:00:00", "steps": 10001, "sleep_hours": 7.6, "screen_time_hours": 2.8, "deep_work_hours": 4.5, "exercise_minutes": 7}, {"user_id": "U1", "date": "2026-01-09T00:00:00", "steps": 11600, "sleep_hours": 8.2, "screen_time_hours": 2.7, "deep_work_hours": 6.0, "exercise_minutes": 6}, {"user_id": "U1", "date": "2026-01-10T00:00:00", "steps": 6119, "sleep_hours": 6.5, "screen_time_hours": 4.8, "deep_work_hours": 4.3, "exercise_minutes": 42}, {"user_id": "U1", "date": "2026-01-11T00:00:00", "steps": 11394, "sleep_hours": 8.2, "screen_time_hours": 6.0, "deep_work_hours": 3.9, "exercise_minutes": 66}, {"user_id": "U1", "date": "2026-01-12T00:00:00", "steps": 5928, "sleep_hours": 6.5, "screen_time_hours": 4.1, "deep_work_hours": 3.9, "exercise_minutes": 2}, {"user_id": "U1", "date": "2026-01-13T00:00:00", "steps": 11620, "sleep_hours": 6.7, "screen_time_hours": 7.6, "deep_work_hours": 5.5, "exercise_minutes": 16}, {"user_id": "U1", "date": "2026-01-14T00:00:00", "steps": 4979, "sleep_hours": 6.1, "screen_time_hours": 8.8, "deep_work_hours": 0.6, "exercise_minutes": 75}, {"user_id": "U1", "date": "2026-01-15T00:00:00", "steps": 6743, "sleep_hours": 8.4, "screen_time_hours": 2.5, "deep_work_hours": 4.3, "exercise_minutes": 9}, {"user_id": "U1", "date": "2026-01-16T00:00:00", "steps": 4892, "sleep_hours": 7.5, "screen_time_hours": 8.4, "deep_work_hours": 4.8, "exercise_minutes": 52}, {"user_id": "U1", "date": "2026-01-17T00:00:00", "steps": 5187, "sleep_hours": 6.5, "screen_time_hours": 8.8, "deep_work_hours": 5.8, "exercise_minutes": 49}, {"user_id": "U1", "date": "2026-01-18T00:00:00", "steps": 7434, "sleep_hours": 8.2, "screen_time_hours": 6.8, "deep_work_hours": 5.4, "exercise_minutes": 58}, {"user_id": "U1", "date": "2026-01-19T00:00:00", "steps": 6804, "sleep_hours": 6.7, "screen_time_hours": 5.6, "deep_work_hours": 5.3, "exercise_minutes": 66}, {"user_id": "U1", "date": "2026-01-20T00:00:00", "steps": 11693, "sleep_hours": 7.8, "screen_time_hours": 4.4, "deep_work_hours": 1.0, "exercise_minutes": 15}, {"user_id": "U1", "date": "2026-01-21T00:00:00", "steps": 7740, "sleep_hours": 8.4, "screen_time_hours": 4.6, "deep_work_hours": 4.5, "exercise_minutes": 72}, {"user_id": "U1", "date": "2026-01-22T00:00:00", "steps": 9933, "sleep_hours": 8.2, "screen_time_hours": 8.7, "deep_work_hours": 4.6, "exercise_minutes": 43}, {"user_id": "U1", "date": "2026-01-23T00:00:00", "steps": 4020, "sleep_hours": 7.3, "screen_time_hours": 2.2, "deep_work_hours": 1.7, "exercise_minutes": 16}, {"user_id": "U1", "date": "2026-01-24T00:00:00", "steps": 5558, "sleep_hours": 6.4, "screen_time_hours": 8.6, "deep_work_hours": 6.0, "exercise_minutes": 53}, {"user_id": "U1", "date": "2026-01-25T00:00:00", "steps": 4938, "sleep_hours": 6.1, "screen_time_hours": 3.8, "deep_work_hours": 3.3, "exercise_minutes": 19}, {"user_id": "U1", "date": "2026-01-26T00:00:00", "steps": 11684, "sleep_hours": 6.0, "screen_time_hours": 7.5, "deep_work_hours": 0.7, "exercise_minutes": 9}, {"user_id": "U1", "date": "2026-01-27T00:00:00", "steps": 6083, "sleep_hours": 7.7, "screen_time_hours": 6.4, "deep_work_hours": 4.7, "exercise_minutes": 73}, {"user_id": "U1", "date": "2026-01-28T00:00:00", "steps": 10434, "sleep_hours": 8.2, "screen_time_hours": 5.1, "deep_work_hours": 2.8, "exercise_minutes": 38}, {"user_id": "U1", "date": "2026-01-29T00:00:00", "steps": 5514, "sleep_hours": 7.3, "screen_time_hours": 2.1, "deep_work_hours": 1.8, "exercise_minutes": 48}, {"user_id": "U1", "date": "2026-01-30T00:00:00", "steps": 7771, "sleep_hours": 5.5, "screen_time_hours": 6.2, "deep_work_hours": 5.2, "exercise_minutes": 4}, {"user_id": "U2", "date": "2026-01-01T00:00:00", "steps": 10186, "sleep_hours": 6.9, "screen_time_hours": 2.5, "deep_work_hours": 2.8, "exercise_minutes": 27}, {"user_id": "U2", "date": "2026-01-02T00:00:00", "steps": 4665, "sleep_hours": 8.3, "screen_time_hours": 5.1, "deep_work_hours": 0.9, "exercise_minutes": 15}, {"user_id": "U2", "date": "2026-01-03T00:00:00", "steps": 10469, "sleep_hours": 6.9, "screen_time_hours": 3.6, "deep_work_hours": 2.2, "exercise_minutes": 57}, {"user_id": "U2", "date": "2026-01-04T00:00:00", "steps": 9416, "sleep_hours": 7.9, "screen_time_hours": 6.5, "deep_work_hours": 1.4, "exercise_minutes": 10}, {"user_id": "U2", "date": "2026-01-05T00:00:00", "steps": 9078, "sleep_hours": 8.3, "screen_time_hours": 7.1, "deep_work_hours": 0.7, "exercise_minutes": 54}, {"user_id": "U2", "date": "2026-01-06T00:00:00", "steps": 9784, "sleep_hours": 8.4, "screen_time_hours": 7.6, "deep_work_hours": 6.0, "exercise_minutes": 87}, {"user_id": "U2", "date": "2026-01-07T00:00:00", "steps": 8935, "sleep_hours": 6.0, "screen_time_hours": 5.6, "deep_work_hours": 2.7, "exercise_minutes": 6}, {"user_id": "U2", "date": "2026-01-08T00:00:00", "steps": 8659, "sleep_hours": 6.0, "screen_time_hours": 7.4, "deep_work_hours": 1.2, "exercise_minutes": 23}, {"user_id": "U2", "date": "2026-01-09T00:00:00", "steps": 11574, "sleep_hours": 8.4, "screen_time_hours": 2.8, "deep_work_hours": 5.5, "exercise_minutes": 81}, {"user_id": "U2", "date": "2026-01-10T00:00:00", "steps": 4362, "sleep_hours": 7.2, "screen_time_hours": 8.0, "deep_work_hours": 1.6, "exercise_minutes": 61}, {"user_id": "U2", "date": "2026-01-11T00:00:00", "steps": 7652, "sleep_hours": 7.3, "screen_time_hours": 2.5, "deep_work_hours": 5.2, "exercise_minutes": 64}, {"user_id": "U2", "date": "2026-01-12T00:00:00", "steps": 4411, "sleep_hours": 6.0, "screen_time_hours": 3.4, "deep_work_hours": 3.1, "exercise_minutes": 46}, {"user_id": "U2", "date": "2026-01-13T00:00:00", "steps": 11596, "sleep_hours": 7.8, "screen_time_hours": 6.1, "deep_work_hours": 2.9, "exercise_minutes": 10}, {"user_id": "U2", "date": "2026-01-14T00:00:00", "steps": 4116, "sleep_hours": 6.5, "screen_time_hours": 3.4, "deep_work_hours": 2.6, "exercise_minutes": 15}, {"user_id": "U2", "date": "2026-01-15T00:00:00", "steps": 9826, "sleep_hours": 8.2, "screen_time_hours": 6.2, "deep_work_hours": 4.1, "exercise_minutes": 65}, {"user_id": "U2", "date": "2026-01-16T00:00:00", "steps": 8358, "sleep_hours": 6.0, "screen_time_hours": 6.9, "deep_work_hours": 4.8, "exercise_minutes": 56}, {"user_id": "U2", "date": "2026-01-17T00:00:00", "steps": 6629, "sleep_hours": 7.1, "screen_time_hours": 6.4, "deep_work_hours": 5.6, "exercise_minutes": 16}, {"user_id": "U2", "date": "2026-01-18T00:00:00", "steps": 5507, "sleep_hours": 6.8, "screen_time_hours": 6.0, "deep_work_hours": 4.4, "exercise_minutes": 45}, {"user_id": "U2", "date": "2026-01-19T00:00:00", "steps": 11474, "sleep_hours": 6.5, "screen_time_hours": 3.9, "deep_work_hours": 3.2, "exercise_minutes": 38}, {"user_id": "U2", "date": "2026-01-20T00:00:00", "steps": 6473, "sleep_hours": 5.8, "screen_time_hours": 8.5, "deep_work_hours": 5.4, "exercise_minutes": 82}, {"user_id": "U2", "date": "2026-01-21T00:00:00", "steps": 6675, "sleep_hours": 8.2, "screen_time_hours": 8.4, "deep_work_hours": 2.4, "exercise_minutes": 63}, {"user_id": "U2", "date": "2026-01-22T00:00:00", "steps": 10940, "sleep_hours": 6.6, "screen_time_hours": 4.1, "deep_work_hours": 5.5, "exercise_minutes": 90}, {"user_id": "U2", "date": "2026-01-23T00:00:00", "steps": 8177, "sleep_hours": 6.6, "screen_time_hours": 6.7, "deep_work_hours": 0.7, "exercise_minutes": 35}, {"user_id": "U2", "date": "2026-01-24T00:00:00", "steps": 9015, "sleep_hours": 7.1, "screen_time_hours": 4.6, "deep_work_hours": 3.9, "exercise_minutes": 39}, {"user_id": "U2", "date": "2026-01-25T00:00:00", "steps": 8935, "sleep_hours": 6.1, "screen_time_hours": 4.9, "deep_work_hours": 1.0, "exercise_minutes": 77}, {"user_id": "U2", "date": "2026-01-26T00:00:00", "steps": 10754, "sleep_hours": 8.2, "screen_time_hours": 7.7, "deep_work_hours": 3.0, "exercise_minutes": 74}, {"user_id": "U2", "date": "2026-01-27T00:00:00", "steps": 7905, "sleep_hours": 8.4, "screen_time_hours": 6.9, "deep_work_hours": 4.6, "exercise_minutes": 60}, {"user_id": "U2", "date": "2026-01-28T00:00:00", "steps": 11816, "sleep_hours": 7.8, "screen_time_hours": 7.4, "deep_work_hours": 2.4, "exercise_minutes": 81}, {"user_id": "U2", "date": "2026-01-29T00:00:00", "steps": 9709, "sleep_hours": 7.1, "screen_time_hours": 8.9, "deep_work_hours": 0.7, "exercise_minutes": 4}, {"user_id": "U2", "date": "2026-01-30T00:00:00", "steps": 7684, "sleep_hours": 5.7, "screen_time_hours": 3.4, "deep_work_hours": 3.3, "exercise_minutes": 54}, {"user_id": "U3", "date": "2026-01-01T00:00:00", "steps": 4573, "sleep_hours": 6.2, "screen_time_hours": 2.5, "deep_work_hours": 1.1, "exercise_minutes": 41}, {"user_id": "U3", "date": "2026-01-02T00:00:00", "steps": 10271, "sleep_hours": 6.3, "screen_time_hours": 6.1, "deep_work_hours": 3.3, "exercise_minutes": 81}, {"user_id": "U3", "date": "2026-01-03T00:00:00", "steps": 8091, "sleep_hours": 7.8, "screen_time_hours": 8.9, "deep_work_hours": 4.9, "exercise_minutes": 72}, {"user_id": "U3", "date": "2026-01-04T00:00:00", "steps": 9246, "sleep_hours": 5.9, "screen_time_hours": 8.1, "deep_work_hours": 5.1, "exercise_minutes": 41}, {"user_id": "U3", "date": "2026-01-05T00:00:00", "steps": 7406, "sleep_hours": 6.1, "screen_time_hours": 4.2, "deep_work_hours": 5.6, "exercise_minutes": 35}, {"user_id": "U3", "date": "2026-01-06T00:00:00", "steps": 7617, "sleep_hours": 5.7, "screen_time_hours": 2.7, "deep_work_hours": 4.7, "exercise_minutes": 52}, {"user_id": "U3", "date": "2026-01-07T00:00:00", "steps": 7118, "sleep_hours": 5.9, "screen_time_hours": 6.0, "deep_work_hours": 2.8, "exercise_minutes": 47}, {"user_id": "U3", "date": "2026-01-08T00:00:00", "steps": 7930, "sleep_hours": 7.2, "screen_time_hours": 4.6, "deep_work_hours": 3.5, "exercise_minutes": 11}, {"user_id": "U3", "date": "2026-01-09T00:00:00", "steps": 9032, "sleep_hours": 6.3, "screen_time_hours": 3.6, "deep_work_hours": 5.0, "exercise_minutes": 49}, {"user_id": "U3", "date": "2026-01-10T00:00:00", "steps": 8801, "sleep_hours": 6.4, "screen_time_hours": 8.9, "deep_work_hours": 4.9, "exercise_minutes": 69}, {"user_id": "U3", "date": "2026-01-11T00:00:00", "steps": 11208, "sleep_hours": 6.5, "screen_time_hours": 3.6, "deep_work_hours": 3.0, "exercise_minutes": 5}, {"user_id": "U3", "date": "2026-01-12T00:00:00", "steps": 6277, "sleep_hours": 6.3, "screen_time_hours": 4.0, "deep_work_hours": 1.0, "exercise_minutes": 7}, {"user_id": "U3", "date": "2026-01-13T00:00:00", "steps": 4291, "sleep_hours": 8.2, "screen_time_hours": 8.6, "deep_work_hours": 3.3, "exercise_minutes": 50}, {"user_id": "U3", "date": "2026-01-14T00:00:00", "steps": 11275, "sleep_hours": 6.8, "screen_time_hours": 3.3, "deep_work_hours": 1.4, "exercise_minutes": 17}, {"user_id": "U3", "date": "2026-01-15T00:00:00", "steps": 8327, "sleep_hours": 8.1, "screen_time_hours": 7.2, "deep_work_hours": 5.6, "exercise_minutes": 9}, {"user_id": "U3", "date": "2026-01-16T00:00:00", "steps": 6601, "sleep_hours": 6.6, "screen_time_hours": 8.6, "deep_work_hours": 0.8, "exercise_minutes": 30}, {"user_id": "U3", "date": "2026-01-17T00:00:00", "steps": 10925, "sleep_hours": 8.5, "screen_time_hours": 7.5, "deep_work_hours": 2.7, "exercise_minutes": 61}, {"user_id": "U3", "date": "2026-01-18T00:00:00", "steps": 8258, "sleep_hours": 5.8, "screen_time_hours": 8.4, "deep_work_hours": 3.8, "exercise_minutes": 54}, {"user_id": "U3", "date": "2026-01-19T00:00:00", "steps": 5585, "sleep_hours": 6.2, "screen_time_hours": 5.2, "deep_work_hours": 1.2, "exercise_minutes": 28}, {"user_id": "U3", "date": "2026-01-20T00:00:00", "steps": 5712, "sleep_hours": 7.6, "screen_time_hours": 3.2, "deep_work_hours": 4.9, "exercise_minutes": 44}, {"user_id": "U3", "date": "2026-01-21T00:00:00", "steps": 10450, "sleep_hours": 7.3, "screen_time_hours": 5.5, "deep_work_hours": 1.3, "exercise_minutes": 66}, {"user_id": "U3", "date": "2026-01-22T00:00:00", "steps": 9249, "sleep_hours": 7.9, "screen_time_hours": 2.3, "deep_work_hours": 4.8, "exercise_minutes": 23}, {"user_id": "U3", "date": "2026-01-23T00:00:00", "steps": 6435, "sleep_hours": 8.3, "screen_time_hours": 6.3, "deep_work_hours": 1.7, "exercise_minutes": 86}, {"user_id": "U3", "date": "2026-01-24T00:00:00", "steps": 11035, "sleep_hours": 7.0, "screen_time_hours": 8.0, "deep_work_hours": 1.0, "exercise_minutes": 60}, {"user_id": "U3", "date": "2026-01-25T00:00:00", "steps": 6189, "sleep_hours": 8.0, "screen_time_hours": 4.2, "deep_work_hours": 3.8, "exercise_minutes": 46}, {"user_id": "U3", "date": "2026-01-26T00:00:00", "steps": 4104, "sleep_hours": 5.8, "screen_time_hours": 4.3, "deep_work_hours": 3.1, "exercise_minutes": 22}, {"user_id": "U3", "date": "2026-01-27T00:00:00", "steps": 5119, "sleep_hours": 8.1, "screen_time_hours": 8.0, "deep_work_hours": 2.9, "exercise_minutes": 56}, {"user_id": "U3", "date": "2026-01-28T00:00:00", "steps": 11900, "sleep_hours": 6.2, "screen_time_hours": 4.5, "deep_work_hours": 1.9, "exercise_minutes": 24}, {"user_id": "U3", "date": "2026-01-29T00:00:00", "steps": 4514, "sleep_hours": 7.2, "screen_time_hours": 2.7, "deep_work_hours": 1.2, "exercise_minutes": 63}, {"user_id": "U3", "date": "2026-01-30T00:00:00", "steps": 6563, "sleep_hours": 8.0, "screen_time_hours": 4.1, "deep_work_hours": 0.8, "exercise_minutes": 66}, {"user_id": "U4", "date": "2026-01-01T00:00:00", "steps": 11839, "sleep_hours": 7.1, "screen_time_hours": 6.1, "deep_work_hours": 4.7, "exercise_minutes": 24}, {"user_id": "U4", "date": "2026-01-02T00:00:00", "steps": 4728, "sleep_hours": 5.7, "screen_time_hours": 4.6, "deep_work_hours": 5.0, "exercise_minutes": 19}, {"user_id": "U4", "date": "2026-01-03T00:00:00", "steps": 6085, "sleep_hours": 7.9, "screen_time_hours": 8.6, "deep_work_hours": 4.2, "exercise_minutes": 69}, {"user_id": "U4", "date": "2026-01-04T00:00:00", "steps": 4517, "sleep_hours": 8.0, "screen_time_hours": 2.6, "deep_work_hours": 3.3, "exercise_minutes": 78}, {"user_id": "U4", "date": "2026-01-05T00:00:00", "steps": 6994, "sleep_hours": 7.0, "screen_time_hours": 7.7, "deep_work_hours": 4.9, "exercise_minutes": 17}, {"user_id": "U4", "date": "2026-01-06T00:00:00", "steps": 4554, "sleep_hours": 5.5, "screen_time_hours": 6.7, "deep_work_hours": 0.7, "exercise_minutes": 4}, {"user_id": "U4", "date": "2026-01-07T00:00:00", "steps": 11100, "sleep_hours": 5.5, "screen_time_hours": 5.8, "deep_work_hours": 3.2, "exercise_minutes": 12}, {"user_id": "U4", "date": "2026-01-08T00:00:00", "steps": 5066, "sleep_hours": 8.0, "screen_time_hours": 8.6, "deep_work_hours": 3.6, "exercise_minutes": 64}, {"user_id": "U4", "date": "2026-01-09T00:00:00", "steps": 7414, "sleep_hours": 5.6, "screen_time_hours": 3.3, "deep_work_hours": 4.2, "exercise_minutes": 4}, {"user_id": "U4", "date": "2026-01-10T00:00:00", "steps": 7307, "sleep_hours": 7.4, "screen_time_hours": 6.8, "deep_work_hours": 4.9, "exercise_minutes": 59}, {"user_id": "U4", "date": "2026-01-11T00:00:00", "steps": 9905, "sleep_hours": 7.7, "screen_time_hours": 2.9, "deep_work_hours": 3.7, "exercise_minutes": 83}, {"user_id": "U4", "date": "2026-01-12T00:00:00", "steps": 7300, "sleep_hours": 6.5, "screen_time_hours": 2.2, "deep_work_hours": 2.0, "exercise_minutes": 85}, {"user_id": "U4", "date": "2026-01-13T00:00:00", "steps": 4034, "sleep_hours": 7.6, "screen_time_hours": 6.5, "deep_work_hours": 0.8, "exercise_minutes": 25}, {"user_id": "U4", "date": "2026-01-14T00:00:00", "steps": 5822, "sleep_hours": 6.2, "screen_time_hours": 5.1, "deep_work_hours": 4.0, "exercise_minutes": 69}, {"user_id": "U4", "date": "2026-01-15T00:00:00", "steps": 9581, "sleep_hours": 8.2, "screen_time_hours": 8.2, "deep_work_hours": 5.5, "exercise_minutes": 29}, {"user_id": "U4", "date": "2026-01-16T00:00:00", "steps": 9800, "sleep_hours": 5.7, "screen_time_hours": 5.1, "deep_work_hours": 2.6, "exercise_minutes": 2}, {"user_id": "U4", "date": "2026-01-17T00:00:00", "steps": 4638, "sleep_hours": 7.7, "screen_time_hours": 3.7, "deep_work_hours": 5.8, "exercise_minutes": 29}, {"user_id": "U4", "date": "2026-01-18T00:00:00", "steps": 6366, "sleep_hours": 7.9, "screen_time_hours": 3.8, "deep_work_hours": 4.5, "exercise_minutes": 11}, {"user_id": "U4", "date": "2026-01-19T00:00:00", "steps": 10741, "sleep_hours": 6.9, "screen_time_hours": 6.7, "deep_work_hours": 5.4, "exercise_minutes": 47}, {"user_id": "U4", "date": "2026-01-20T00:00:00", "steps": 5345, "sleep_hours": 5.5, "screen_time_hours": 8.5, "deep_work_hours": 4.6, "exercise_minutes": 4}, {"user_id": "U4", "date": "2026-01-21T00:00:00", "steps": 7516, "sleep_hours": 8.0, "screen_time_hours": 7.2, "deep_work_hours": 3.4, "exercise_minutes": 82}, {"user_id": "U4", "date": "2026-01-22T00:00:00", "steps": 7156, "sleep_hours": 8.5, "screen_time_hours": 3.9, "deep_work_hours": 0.7, "exercise_minutes": 82}, {"user_id": "U4", "date": "2026-01-23T00:00:00", "steps": 9422, "sleep_hours": 7.5, "screen_time_hours": 7.8, "deep_work_hours": 6.0, "exercise_minutes": 70}, {"user_id": "U4", "date": "2026-01-24T00:00:00", "steps": 8583, "sleep_hours": 6.0, "screen_time_hours": 2.1, "deep_work_hours": 2.4, "exercise_minutes": 32}, {"user_id": "U4", "date": "2026-01-25T00:00:00", "steps": 8909, "sleep_hours": 8.4, "screen_time_hours": 8.9, "deep_work_hours": 1.9, "exercise_minutes": 44}, {"user_id": "U4", "date": "2026-01-26T00:00:00", "steps": 9944, "sleep_hours": 7.4, "screen_time_hours": 8.8, "deep_work_hours": 1.7, "exercise_minutes": 48}, {"user_id": "U4", "date": "2026-01-27T00:00:00", "steps": 11969, "sleep_hours": 5.9, "screen_time_hours": 4.8, "deep_work_hours": 2.7, "exercise_minutes": 22}, {"user_id": "U4", "date": "2026-01-28T00:00:00", "steps": 8780, "sleep_hours": 7.6, "screen_time_hours": 2.9, "deep_work_hours": 0.8, "exercise_minutes": 3}, {"user_id": "U4", "date": "2026-01-29T00:00:00", "steps": 10211, "sleep_hours": 7.2, "screen_time_hours": 3.6, "deep_work_hours": 2.9, "exercise_minutes": 38}, {"user_id": "U4", "date": "2026-01-30T00:00:00", "steps": 9951, "sleep_hours": 6.4, "screen_time_hours": 7.3, "deep_work_hours": 1.1, "exercise_minutes": 45}, {"user_id": "U5", "date": "2026-01-01T00:00:00", "steps": 7110, "sleep_hours": 8.1, "screen_time_hours": 7.4, "deep_work_hours": 1.3, "exercise_minutes": 53}, {"user_id": "U5", "date": "2026-01-02T00:00:00", "steps": 11891, "sleep_hours": 8.2, "screen_time_hours": 4.4, "deep_work_hours": 3.8, "exercise_minutes": 25}, {"user_id": "U5", "date": "2026-01-03T00:00:00", "steps": 6911, "sleep_hours": 6.4, "screen_time_hours": 7.5, "deep_work_hours": 0.5, "exercise_minutes": 40}, {"user_id": "U5", "date": "2026-01-04T00:00:00", "steps": 5624, "sleep_hours": 6.2, "screen_time_hours": 8.0, "deep_work_hours": 3.4, "exercise_minutes": 61}, {"user_id": "U5", "date": "2026-01-05T00:00:00", "steps": 9950, "sleep_hours": 6.2, "screen_time_hours": 2.9, "deep_work_hours": 3.4, "exercise_minutes": 72}, {"user_id": "U5", "date": "2026-01-06T00:00:00", "steps": 5775, "sleep_hours": 8.3, "screen_time_hours": 6.6, "deep_work_hours": 5.1, "exercise_minutes": 44}, {"user_id": "U5", "date": "2026-01-07T00:00:00", "steps": 4068, "sleep_hours": 6.8, "screen_time_hours": 6.2, "deep_work_hours": 5.5, "exercise_minutes": 78}, {"user_id": "U5", "date": "2026-01-08T00:00:00", "steps": 10613, "sleep_hours": 7.2, "screen_time_hours": 2.7, "deep_work_hours": 0.6, "exercise_minutes": 71}, {"user_id": "U5", "date": "2026-01-09T00:00:00", "steps": 5134, "sleep_hours": 6.8, "screen_time_hours": 2.6, "deep_work_hours": 5.2, "exercise_minutes": 7}, {"user_id": "U5", "date": "2026-01-10T00:00:00", "steps": 5403, "sleep_hours": 7.4, "screen_time_hours": 3.9, "deep_work_hours": 0.6, "exercise_minutes": 36}, {"user_id": "U5", "date": "2026-01-11T00:00:00", "steps": 11211, "sleep_hours": 8.4, "screen_time_hours": 8.6, "deep_work_hours": 2.2, "exercise_minutes": 39}, {"user_id": "U5", "date": "2026-01-12T00:00:00", "steps": 11626, "sleep_hours": 6.6, "screen_time_hours": 4.9, "deep_work_hours": 1.5, "exercise_minutes": 42}, {"user_id": "U5", "date": "2026-01-13T00:00:00", "steps": 11065, "sleep_hours": 7.8, "screen_time_hours": 5.7, "deep_work_hours": 4.9, "exercise_minutes": 22}, {"user_id": "U5", "date": "2026-01-14T00:00:00", "steps": 11336, "sleep_hours": 7.6, "screen_time_hours": 5.9, "deep_work_hours": 3.9, "exercise_minutes": 43}, {"user_id": "U5", "date": "2026-01-15T00:00:00", "steps": 6138, "sleep_hours": 6.3, "screen_time_hours": 3.2, "deep_work_hours": 3.6, "exercise_minutes": 35}, {"user_id": "U5", "date": "2026-01-16T00:00:00", "steps": 8007, "sleep_hours": 6.4, "screen_time_hours": 8.9, "deep_work_hours": 5.7, "exercise_minutes": 54}, {"user_id": "U5", "date": "2026-01-17T00:00:00", "steps": 5344, "sleep_hours": 6.7, "screen_time_hours": 4.3, "deep_work_hours": 5.4, "exercise_minutes": 73}, {"user_id": "U5", "date": "2026-01-18T00:00:00", "steps": 4898, "sleep_hours": 8.0, "screen_time_hours": 6.2, "deep_work_hours": 4.9, "exercise_minutes": 76}, {"user_id": "U5", "date": "2026-01-19T00:00:00", "steps": 8379, "sleep_hours": 7.0, "screen_time_hours": 5.4, "deep_work_hours": 3.6, "exercise_minutes": 77}, {"user_id": "U5", "date": "2026-01-20T00:00:00", "steps": 5095, "sleep_hours": 8.2, "screen_time_hours": 8.9, "deep_work_hours": 4.1, "exercise_minutes": 76}, {"user_id": "U5", "date": "2026-01-21T00:00:00", "steps": 9888, "sleep_hours": 7.4, "screen_time_hours": 5.9, "deep_work_hours": 1.1, "exercise_minutes": 8}, {"user_id": "U5", "date": "2026-01-22T00:00:00", "steps": 10014, "sleep_hours": 8.2, "screen_time_hours": 5.6, "deep_work_hours": 2.0, "exercise_minutes": 86}, {"user_id": "U5", "date": "2026-01-23T00:00:00", "steps": 5983, "sleep_hours": 8.0, "screen_time_hours": 8.3, "deep_work_hours": 5.4, "exercise_minutes": 35}, {"user_id": "U5", "date": "2026-01-24T00:00:00", "steps": 7513, "sleep_hours": 6.3, "screen_time_hours": 6.0, "deep_work_hours": 4.1, "exercise_minutes": 42}, {"user_id": "U5", "date": "2026-01-25T00:00:00", "steps": 4274, "sleep_hours": 6.1, "screen_time_hours": 5.2, "deep_work_hours": 5.3, "exercise_minutes": 78}, {"user_id": "U5", "date": "2026-01-26T00:00:00", "steps": 10391, "sleep_hours": 6.2, "screen_time_hours": 4.0, "deep_work_hours": 4.0, "exercise_minutes": 16}, {"user_id": "U5", "date": "2026-01-27T00:00:00", "steps": 7767, "sleep_hours": 5.6, "screen_time_hours": 5.4, "deep_work_hours": 2.9, "exercise_minutes": 80}, {"user_id": "U5", "date": "2026-01-28T00:00:00", "steps": 6361, "sleep_hours": 7.1, "screen_time_hours": 4.2, "deep_work_hours": 3.4, "exercise_minutes": 58}, {"user_id": "U5", "date": "2026-01-29T00:00:00", "steps": 8627, "sleep_hours": 7.8, "screen_time_hours": 4.8, "deep_work_hours": 5.9, "exercise_minutes": 62}, {"user_id": "U5", "date": "2026-01-30T00:00:00", "steps": 7354, "sleep_hours": 8.3, "screen_time_hours": 8.3, "deep_work_hours": 3.1, "exercise_minutes": 75}];
+        const chronisInsights = {"U4": [{"type": "pattern", "insight": "Deep work focus hours decreased.", "confidence": 0.73, "evidence": "Average daily focus changed from 3.8 to 1.9 hours (-50.0%).", "metric": "deep_work_hours", "date": null, "details": {"baseline_mean": 3.8, "current_mean": 1.9, "cohens_d": -1.3100204461653029}}, {"type": "anomaly", "insight": "Anomaly detected on 2026-01-06: Deep work focus drop.", "confidence": 0.99, "evidence": "Deep work hours were 0.7 hours (rolling average: 4.4 hours, deviation: -5.3\u03c3).", "metric": "deep_work_hours", "date": "2026-01-06", "details": {"value": 0.7, "rolling_mean": 4.42, "rolling_std": 0.697853852894716, "z_score": -5.3306290200582005}}, {"type": "anomaly", "insight": "Anomaly detected on 2026-01-13: Deep work focus drop.", "confidence": 0.74, "evidence": "Deep work hours were 0.8 hours (rolling average: 3.7 hours, deviation: -2.2\u03c3).", "metric": "deep_work_hours", "date": "2026-01-13", "details": {"value": 0.8, "rolling_mean": 3.6999999999999997, "rolling_std": 1.2926364883094903, "z_score": -2.2434768213858938}}, {"type": "anomaly", "insight": "Anomaly detected on 2026-01-22: Deep work focus drop.", "confidence": 0.74, "evidence": "Deep work hours were 0.7 hours (rolling average: 3.9 hours, deviation: -2.3\u03c3).", "metric": "deep_work_hours", "date": "2026-01-22", "details": {"value": 0.7, "rolling_mean": 3.9285714285714284, "rolling_std": 1.4046234488171676, "z_score": -2.2985316322963327}}], "U1": [{"type": "anomaly", "insight": "Anomaly detected on 2026-01-07: Slept longer than usual.", "confidence": 0.85, "evidence": "Sleep duration was 8.2 hours (rolling average: 6.5 hours, deviation: +3.0\u03c3).", "metric": "sleep_hours", "date": "2026-01-07", "details": {"value": 8.2, "rolling_mean": 6.466666666666666, "rolling_std": 0.5819507424745385, "z_score": 2.9784880520350403}}, {"type": "anomaly", "insight": "Anomaly detected on 2026-01-14: Deep work focus drop.", "confidence": 0.74, "evidence": "Deep work hours were 0.6 hours (rolling average: 4.1 hours, deviation: -2.3\u03c3).", "metric": "deep_work_hours", "date": "2026-01-14", "details": {"value": 0.6, "rolling_mean": 4.138461538461538, "rolling_std": 1.5516327215433756, "z_score": -2.280476229543488}}, {"type": "anomaly", "insight": "Anomaly detected on 2026-01-07: Significant decline in steps.", "confidence": 0.73, "evidence": "Steps reached 4,134 (rolling average: 8,993, deviation: -2.2\u03c3).", "metric": "steps", "date": "2026-01-07", "details": {"value": 4134.0, "rolling_mean": 8992.833333333334, "rolling_std": 2181.475960597931, "z_score": -2.2273146351800976}}, {"type": "anomaly", "insight": "Anomaly detected on 2026-01-20: Deep work focus drop.", "confidence": 0.73, "evidence": "Deep work hours were 1.0 hours (rolling average: 4.4 hours, deviation: -2.2\u03c3).", "metric": "deep_work_hours", "date": "2026-01-20", "details": {"value": 1.0, "rolling_mean": 4.385714285714285, "rolling_std": 1.5619795836630577, "z_score": -2.167579090742222}}, {"type": "anomaly", "insight": "Anomaly detected on 2026-01-30: Severe sleep restriction.", "confidence": 0.73, "evidence": "Sleep duration was 5.5 hours (rolling average: 7.3 hours, deviation: -2.2\u03c3).", "metric": "sleep_hours", "date": "2026-01-30", "details": {"value": 5.5, "rolling_mean": 7.307142857142857, "rolling_std": 0.833402927496922, "z_score": -2.16839033979699}}, {"type": "anomaly", "insight": "Anomaly detected on 2026-01-08: Unusually low screen time.", "confidence": 0.72, "evidence": "Screen time was 2.8 hours (rolling average: 7.0 hours, deviation: -2.1\u03c3).", "metric": "screen_time_hours", "date": "2026-01-08", "details": {"value": 2.8, "rolling_mean": 7.0, "rolling_std": 1.9941581348194697, "z_score": -2.1061519278059784}}], "U2": [{"type": "anomaly", "insight": "Anomaly detected on 2026-01-06: High productivity day.", "confidence": 0.99, "evidence": "Deep work hours were 6.0 hours (rolling average: 1.6 hours, deviation: +5.0\u03c3).", "metric": "deep_work_hours", "date": "2026-01-06", "details": {"value": 6.0, "rolling_mean": 1.6, "rolling_std": 0.8860022573334675, "z_score": 4.966127302251284}}, {"type": "anomaly", "insight": "Anomaly detected on 2026-01-07: Severe sleep restriction.", "confidence": 0.78, "evidence": "Sleep duration was 6.0 hours (rolling average: 7.8 hours, deviation: -2.5\u03c3).", "metric": "sleep_hours", "date": "2026-01-07", "details": {"value": 6.0, "rolling_mean": 7.783333333333334, "rolling_std": 0.7054549359574055, "z_score": -2.527919562874828}}, {"type": "anomaly", "insight": "Anomaly detected on 2026-01-10: Significant decline in steps.", "confidence": 0.78, "evidence": "Steps reached 4,362 (rolling average: 9,196, deviation: -2.5\u03c3).", "metric": "steps", "date": "2026-01-10", "details": {"value": 4362.0, "rolling_mean": 9196.222222222223, "rolling_std": 1921.9141355545632, "z_score": -2.515316440412839}}, {"type": "anomaly", "insight": "Anomaly detected on 2026-01-29: Unusually low physical exercise.", "confidence": 0.78, "evidence": "Exercise minutes were 4 mins (rolling average: 59 mins, deviation: -2.5\u03c3).", "metric": "exercise_minutes", "date": "2026-01-29", "details": {"value": 4.0, "rolling_mean": 58.642857142857146, "rolling_std": 21.56424085184738, "z_score": -2.53395691127128}}, {"type": "anomaly", "insight": "Anomaly detected on 2026-01-06: Intense exercise session.", "confidence": 0.77, "evidence": "Exercise minutes were 87 mins (rolling average: 33 mins, deviation: +2.5\u03c3).", "metric": "exercise_minutes", "date": "2026-01-06", "details": {"value": 87.0, "rolling_mean": 32.6, "rolling_std": 21.824298385056963, "z_score": 2.492634541564348}}, {"type": "anomaly", "insight": "Anomaly detected on 2026-01-23: Deep work focus drop.", "confidence": 0.77, "evidence": "Deep work hours were 0.7 hours (rolling average: 4.0 hours, deviation: -2.4\u03c3).", "metric": "deep_work_hours", "date": "2026-01-23", "details": {"value": 0.7, "rolling_mean": 4.021428571428571, "rolling_std": 1.3644827543113864, "z_score": -2.4342034085324857}}], "U3": [{"type": "anomaly", "insight": "Anomaly detected on 2026-01-13: Slept longer than usual.", "confidence": 0.87, "evidence": "Sleep duration was 8.2 hours (rolling average: 6.4 hours, deviation: +3.1\u03c3).", "metric": "sleep_hours", "date": "2026-01-13", "details": {"value": 8.2, "rolling_mean": 6.383333333333333, "rolling_std": 0.5843929769557052, "z_score": 3.108638772714688}}, {"type": "anomaly", "insight": "Anomaly detected on 2026-01-08: Unusually low physical exercise.", "confidence": 0.76, "evidence": "Exercise minutes were 11 mins (rolling average: 53 mins, deviation: -2.4\u03c3).", "metric": "exercise_minutes", "date": "2026-01-08", "details": {"value": 11.0, "rolling_mean": 52.714285714285715, "rolling_std": 17.28886236583431, "z_score": -2.412783723509775}}, {"type": "anomaly", "insight": "Anomaly detected on 2026-01-11: Unusually low physical exercise.", "confidence": 0.73, "evidence": "Exercise minutes were 5 mins (rolling average: 50 mins, deviation: -2.2\u03c3).", "metric": "exercise_minutes", "date": "2026-01-11", "details": {"value": 5.0, "rolling_mean": 49.8, "rolling_std": 20.351358131038275, "z_score": -2.201327287915719}}, {"type": "anomaly", "insight": "Anomaly detected on 2026-01-12: Deep work focus drop.", "confidence": 0.73, "evidence": "Deep work hours were 1.0 hours (rolling average: 4.0 hours, deviation: -2.2\u03c3).", "metric": "deep_work_hours", "date": "2026-01-12", "details": {"value": 1.0, "rolling_mean": 3.9909090909090907, "rolling_std": 1.3590103351001752, "z_score": -2.2007993711752203}}, {"type": "anomaly", "insight": "Anomaly detected on 2026-01-13: Significant decline in steps.", "confidence": 0.73, "evidence": "Steps reached 4,291 (rolling average: 8,131, deviation: -2.2\u03c3).", "metric": "steps", "date": "2026-01-13", "details": {"value": 4291.0, "rolling_mean": 8130.833333333333, "rolling_std": 1771.1353745977508, "z_score": -2.168006685658013}}, {"type": "anomaly", "insight": "Anomaly detected on 2026-01-17: Slept longer than usual.", "confidence": 0.73, "evidence": "Sleep duration was 8.5 hours (rolling average: 6.7 hours, deviation: +2.2\u03c3).", "metric": "sleep_hours", "date": "2026-01-17", "details": {"value": 8.5, "rolling_mean": 6.7, "rolling_std": 0.8218178723930352, "z_score": 2.1902663113891836}}, {"type": "anomaly", "insight": "Anomaly detected on 2026-01-23: Intense exercise session.", "confidence": 0.73, "evidence": "Exercise minutes were 86 mins (rolling average: 37 mins, deviation: +2.2\u03c3).", "metric": "exercise_minutes", "date": "2026-01-23", "details": {"value": 86.0, "rolling_mean": 36.57142857142857, "rolling_std": 22.400941895424797, "z_score": 2.2065398704804817}}, {"type": "anomaly", "insight": "Anomaly detected on 2026-01-15: Slept longer than usual.", "confidence": 0.72, "evidence": "Sleep duration was 8.1 hours (rolling average: 6.5 hours, deviation: +2.1\u03c3).", "metric": "sleep_hours", "date": "2026-01-15", "details": {"value": 8.1, "rolling_mean": 6.542857142857143, "rolling_std": 0.7271803138088987, "z_score": 2.141343525908583}}, {"type": "anomaly", "insight": "Anomaly detected on 2026-01-11: Unusual step count detected.", "confidence": 0.71, "evidence": "Steps reached 11,208 (rolling average: 8,008, deviation: +2.1\u03c3).", "metric": "steps", "date": "2026-01-11", "details": {"value": 11208.0, "rolling_mean": 8008.5, "rolling_std": 1543.8342779514185, "z_score": 2.0724374666985352}}, {"type": "anomaly", "insight": "Anomaly detected on 2026-01-16: Deep work focus drop.", "confidence": 0.71, "evidence": "Deep work hours were 0.8 hours (rolling average: 3.9 hours, deviation: -2.1\u03c3).", "metric": "deep_work_hours", "date": "2026-01-16", "details": {"value": 0.8, "rolling_mean": 3.864285714285714, "rolling_std": 1.483554537566471, "z_score": -2.0655025728357614}}], "U5": [{"type": "anomaly", "insight": "Anomaly detected on 2026-01-09: Unusually low physical exercise.", "confidence": 0.8, "evidence": "Exercise minutes were 7 mins (rolling average: 56 mins, deviation: -2.6\u03c3).", "metric": "exercise_minutes", "date": "2026-01-09", "details": {"value": 7.0, "rolling_mean": 55.5, "rolling_std": 18.35366837602616, "z_score": -2.642523500280273}}]};
+        const abstentionCounts = {"U3": 2, "U5": 2, "U1": 1, "U4": 1, "U2": 2};
+
+        let activeUser = "";
+        let activityChartObj = null;
+        let sleepScreenChartObj = null;
+
+        // Initialize Dashboard
+        window.addEventListener('DOMContentLoaded', () => {
+            const users = Object.keys(chronisInsights);
+            if (users.length > 0) {
+                renderUserTabs(users);
+                selectUser(users[0]);
+            }
+        });
+
+        function renderUserTabs(users) {
+            const container = document.getElementById('userTabs');
+            container.innerHTML = '';
+            users.forEach(u => {
+                const btn = document.createElement('button');
+                btn.className = `user-tab ${u === activeUser ? 'active' : ''}`;
+                btn.id = `tab-${u}`;
+                btn.onclick = () => selectUser(u);
+                
+                const label = document.createElement('span');
+                label.innerText = `Profile ${u}`;
+                
+                const dot = document.createElement('span');
+                dot.className = 'user-dot';
+                
+                btn.appendChild(label);
+                btn.appendChild(dot);
+                container.appendChild(btn);
+            });
+        }
+
+        function selectUser(userId) {
+            // Update active tab state
+            if (activeUser) {
+                const oldTab = document.getElementById(`tab-${activeUser}`);
+                if (oldTab) oldTab.classList.remove('active');
+            }
+            activeUser = userId;
+            const newTab = document.getElementById(`tab-${userId}`);
+            if (newTab) newTab.classList.add('active');
+
+            // Update Header
+            document.getElementById('dashboardUserTitle').innerText = `Preserved Profile: ${userId}`;
+            
+            // Get User Data
+            const userData = chronisData.filter(d => d.user_id === userId);
+            
+            // Calculate averages
+            const avgSteps = Math.round(userData.reduce((sum, d) => sum + d.steps, 0) / userData.length);
+            const avgSleep = (userData.reduce((sum, d) => sum + d.sleep_hours, 0) / userData.length).toFixed(1);
+            const avgScreen = (userData.reduce((sum, d) => sum + d.screen_time_hours, 0) / userData.length).toFixed(1);
+            const avgWork = (userData.reduce((sum, d) => sum + d.deep_work_hours, 0) / userData.length).toFixed(1);
+            const avgExercise = Math.round(userData.reduce((sum, d) => sum + d.exercise_minutes, 0) / userData.length);
+
+            // Render Stat Cards
+            const statGrid = document.getElementById('statGrid');
+            statGrid.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-label">Daily Steps</div>
+                    <div class="stat-value" style="color: var(--accent-green);">${avgSteps.toLocaleString()}</div>
+                    <div class="stat-desc">Monthly Mean</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Sleep Hours</div>
+                    <div class="stat-value" style="color: var(--accent-cyan);">${avgSleep}h</div>
+                    <div class="stat-desc">Monthly Mean</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Screen Time</div>
+                    <div class="stat-value" style="color: var(--accent-amber);">${avgScreen}h</div>
+                    <div class="stat-desc">Monthly Mean</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Deep Work</div>
+                    <div class="stat-value" style="color: var(--accent-purple);">${avgWork}h</div>
+                    <div class="stat-desc">Monthly Mean</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Daily Exercise</div>
+                    <div class="stat-value" style="color: #a3e635;">${avgExercise}m</div>
+                    <div class="stat-desc">Monthly Mean</div>
+                </div>
+            `;
+
+            // Render Insights List
+            const insightsList = document.getElementById('insightsList');
+            const userInsightsList = chronisInsights[userId] || [];
+            document.getElementById('insightCount').innerText = `${userInsightsList.length} active claims`;
+            
+            insightsList.innerHTML = '';
+            if (userInsightsList.length === 0) {
+                insightsList.innerHTML = `<div class="empty-insights">No strong behavioral claims survived sufficiency analysis for this profile.</div>`;
+            } else {
+                userInsightsList.forEach(ins => {
+                    const card = document.createElement('div');
+                    card.className = 'insight-card';
+                    
+                    let badgeClass = 'badge-trend-incline';
+                    let badgeLabel = 'Trend';
+                    if (ins.type === 'anomaly') {
+                        badgeClass = 'badge-anomaly';
+                        badgeLabel = 'Anomaly';
+                    } else if (ins.metric === 'steps' && ins.details.cohens_d < 0) {
+                        badgeClass = 'badge-trend-decline';
+                    } else if (ins.metric === 'sleep_hours' && ins.details.cohens_d < 0) {
+                        badgeClass = 'badge-trend-decline';
+                    } else if (ins.metric === 'deep_work_hours' && ins.details.cohens_d < 0) {
+                        badgeClass = 'badge-trend-decline';
+                    } else if (ins.metric === 'exercise_minutes' && ins.details.cohens_d < 0) {
+                        badgeClass = 'badge-trend-decline';
+                    }
+                    
+                    card.innerHTML = `
+                        <div class="insight-meta">
+                            <span class="insight-badge ${badgeClass}">${badgeLabel}</span>
+                            <div class="confidence-container">
+                                <span>Confidence</span>
+                                <div class="confidence-bar-bg">
+                                    <div class="confidence-bar-fill" style="width: ${ins.confidence * 100}%;"></div>
+                                </div>
+                                <span style="font-weight: 600;">${Math.round(ins.confidence * 100)}%</span>
+                            </div>
+                        </div>
+                        <div class="insight-title">${ins.insight}</div>
+                        <div class="insight-evidence">${ins.evidence}</div>
+                    `;
+                    insightsList.appendChild(card);
+                });
+            }
+
+            // Update Sufficiency Status
+            const countWithheld = abstentionCounts[userId] || 0;
+            document.getElementById('sufficiencyStatus').innerText = `${countWithheld} insights withheld`;
+
+            // Draw Charts
+            drawCharts(userData);
+        }
+
+        function drawCharts(userData) {
+            const dates = userData.map(d => d.date.split('T')[0]);
+            
+            // 1. Activity Chart (Steps & Exercise)
+            const stepsData = userData.map(d => d.steps);
+            const exerciseData = userData.map(d => d.exercise_minutes);
+
+            if (activityChartObj) {
+                activityChartObj.destroy();
+            }
+
+            const ctxActivity = document.getElementById('activityChart').getContext('2d');
+            activityChartObj = new Chart(ctxActivity, {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [
+                        {
+                            label: 'Daily Steps',
+                            data: stepsData,
+                            borderColor: '#10b981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.05)',
+                            borderWidth: 2,
+                            pointRadius: 3,
+                            yAxisID: 'ySteps',
+                            fill: true,
+                            tension: 0.2
+                        },
+                        {
+                            label: 'Exercise (min)',
+                            data: exerciseData,
+                            borderColor: '#a3e635',
+                            backgroundColor: 'transparent',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            pointRadius: 3,
+                            yAxisID: 'yExercise',
+                            fill: false,
+                            tension: 0.2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(255, 255, 255, 0.03)' },
+                            ticks: { color: '#71717a', font: { size: 9 } }
+                        },
+                        ySteps: {
+                            type: 'linear',
+                            position: 'left',
+                            grid: { color: 'rgba(255, 255, 255, 0.03)' },
+                            ticks: { color: '#10b981', font: { size: 9 } },
+                            title: { display: true, text: 'Steps', color: '#10b981', font: { size: 10 } }
+                        },
+                        yExercise: {
+                            type: 'linear',
+                            position: 'right',
+                            grid: { display: false },
+                            ticks: { color: '#a3e635', font: { size: 9 } },
+                            title: { display: true, text: 'Exercise Minutes', color: '#a3e635', font: { size: 10 } }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: { color: '#f4f4f5', font: { size: 10 } }
+                        }
+                    }
+                }
+            });
+
+            // 2. Sleep & Screen Time Chart
+            const sleepData = userData.map(d => d.sleep_hours);
+            const screenData = userData.map(d => d.screen_time_hours);
+
+            if (sleepScreenChartObj) {
+                sleepScreenChartObj.destroy();
+            }
+
+            const ctxSleep = document.getElementById('sleepScreenChart').getContext('2d');
+            sleepScreenChartObj = new Chart(ctxSleep, {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [
+                        {
+                            label: 'Sleep Hours',
+                            data: sleepData,
+                            borderColor: '#06b6d4',
+                            backgroundColor: 'rgba(6, 182, 212, 0.05)',
+                            borderWidth: 2,
+                            pointRadius: 3,
+                            yAxisID: 'ySleep',
+                            fill: true,
+                            tension: 0.2
+                        },
+                        {
+                            label: 'Screen Time (h)',
+                            data: screenData,
+                            borderColor: '#ef4444',
+                            backgroundColor: 'transparent',
+                            borderWidth: 2,
+                            borderDash: [3, 3],
+                            pointRadius: 3,
+                            yAxisID: 'yScreen',
+                            fill: false,
+                            tension: 0.2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(255, 255, 255, 0.03)' },
+                            ticks: { color: '#71717a', font: { size: 9 } }
+                        },
+                        ySleep: {
+                            type: 'linear',
+                            position: 'left',
+                            grid: { color: 'rgba(255, 255, 255, 0.03)' },
+                            ticks: { color: '#06b6d4', font: { size: 9 } },
+                            title: { display: true, text: 'Sleep Hours', color: '#06b6d4', font: { size: 10 } }
+                        },
+                        yScreen: {
+                            type: 'linear',
+                            position: 'right',
+                            grid: { display: false },
+                            ticks: { color: '#ef4444', font: { size: 9 } },
+                            title: { display: true, text: 'Screen Hours', color: '#ef4444', font: { size: 10 } }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: { color: '#f4f4f5', font: { size: 10 } }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

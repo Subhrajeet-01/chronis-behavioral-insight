@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chronis — Behavioral Insight Engine</title>
+    <!-- Premium Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-color: #050507;
+            --card-bg: rgba(18, 18, 22, 0.75);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --text-primary: #f4f4f5;
+            --text-secondary: #a1a1aa;
+            --accent-green: #10b981;
+            --accent-green-glow: rgba(16, 185, 129, 0.15);
+            --accent-red: #ef4444;
+            --accent-red-glow: rgba(239, 68, 68, 0.15);
+            --accent-purple: #8b5cf6;
+            --accent-cyan: #06b6d4;
+            --accent-amber: #f59e0b;
+            --accent-amber-glow: rgba(245, 158, 11, 0.15);
+            --sidebar-width: 280px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar Navigation */
+        aside {
+            width: var(--sidebar-width);
+            border-right: 1px solid var(--card-border);
+            background: rgba(10, 10, 12, 0.95);
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 10;
+        }
+
+        .logo-container {
+            margin-bottom: 3rem;
+        }
+
+        .logo-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            background: linear-gradient(135deg, #ffffff 30%, #a1a1aa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-subtitle {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: var(--accent-purple);
+            margin-top: 0.2rem;
+            font-weight: 600;
+        }
+
+        .user-menu-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .user-tabs {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .user-tab {
+            background: transparent;
+            border: 1px solid transparent;
+            color: var(--text-secondary);
+            padding: 0.85rem 1.2rem;
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: left;
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .user-tab:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.03);
+            border-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .user-tab.active {
+            color: var(--text-primary);
+            background: rgba(139, 92, 246, 0.1);
+            border-color: rgba(139, 92, 246, 0.3);
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.05);
+        }
+
+        .user-tab .user-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--text-secondary);
+            transition: background-color 0.3s;
+        }
+
+        .user-tab.active .user-dot {
+            background-color: var(--accent-purple);
+            box-shadow: 0 0 8px var(--accent-purple);
+        }
+
+        .sidebar-footer {
+            margin-top: auto;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--card-border);
+            padding-top: 1.5rem;
+            line-height: 1.4;
+        }
+
+        /* Main Content Dashboard */
+        main {
+            margin-left: var(--sidebar-width);
+            flex-grow: 1;
+            padding: 2.5rem 3rem;
+            max-width: 1400px;
+        }
+
+        .header-section {
+            margin-bottom: 2.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .header-info h1 {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .header-info p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .meta-badge {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--card-border);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        /* Stat Grid Cards */
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 1.2rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 1.25rem;
+            backdrop-filter: blur(12px);
+            transition: transform 0.3s, border-color 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-desc {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        /* Grid Layout for Charts & Insights */
+        .dashboard-body {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .panel {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 1.75rem;
+            backdrop-filter: blur(12px);
+        }
+
+        .panel-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-subtitle {
+            font-size: 0.8rem;
+            font-weight: 400;
+            color: var(--text-secondary);
+        }
+
+        /* Charts Panel */
+        .charts-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 250px;
+            width: 100%;
+        }
+
+        /* Insights Panel */
+        .insights-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-height: 560px;
+            overflow-y: auto;
+            padding-right: 0.5rem;
+        }
+
+        /* Custom scrollbar for insights list */
+        .insights-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        .insights-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .insights-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+        .insights-list::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .insight-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 14px;
+            padding: 1.2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            transition: all 0.3s;
+        }
+
+        .insight-card:hover {
+            background: rgba(255, 255, 255, 0.04);
+            border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .insight-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .insight-badge {
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+        }
+
+        .badge-trend-incline {
+            background-color: var(--accent-green-glow);
+            color: var(--accent-green);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .badge-trend-decline {
+            background-color: var(--accent-red-glow);
+            color: var(--accent-red);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .badge-anomaly {
+            background-color: var(--accent-amber-glow);
+            color: var(--accent-amber);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .confidence-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .confidence-bar-bg {
+            width: 60px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .confidence-bar-fill {
+            height: 100%;
+            background: var(--accent-purple);
+            border-radius: 10px;
+        }
+
+        .insight-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .insight-evidence {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            background: rgba(0, 0, 0, 0.15);
+            padding: 0.6rem 0.8rem;
+            border-radius: 8px;
+            border-left: 3px solid var(--accent-purple);
+        }
+
+        .empty-insights {
+            color: var(--text-secondary);
+            text-align: center;
+            padding: 3rem 0;
+            font-size: 0.9rem;
+        }
+
+        /* Custom evidence sufficiency style */
+        .sufficiency-panel {
+            background: rgba(139, 92, 246, 0.03);
+            border: 1px solid rgba(139, 92, 246, 0.1);
+            border-radius: 16px;
+            padding: 1.25rem 1.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.85rem;
+        }
+
+        .sufficiency-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .sufficiency-title span.icon {
+            display: inline-block;
+            background: rgba(139, 92, 246, 0.15);
+            color: var(--accent-purple);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 24px;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+
+        .sufficiency-desc {
+            color: var(--text-secondary);
+        }
+
+        .sufficiency-badge {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            padding: 0.35rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            color: var(--accent-purple);
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <aside>
+        <div class="logo-container">
+            <div class="logo-title">CHRONIS</div>
+            <div class="logo-subtitle">Insight Engine</div>
+        </div>
+        
+        <div class="user-menu-label">Preserved Profiles</div>
+        <div class="user-tabs" id="userTabs">
+            <!-- Tabs will be rendered here dynamically -->
+        </div>
+        
+        <div class="sidebar-footer">
+        </div>
+    </aside>
+
+    <!-- Main Dashboard -->
+    <main>
+        <div class="header-section">
+            <div class="header-info">
+                <h1 id="dashboardUserTitle">User Dashboard</h1>
+                <p>Synthesis of behavioral observations over a 30-day window.</p>
+            </div>
+            <div class="meta-badge" id="dataDaysBadge">
+                30 observations logged
+            </div>
+        </div>
+
+        <!-- Metrics Stats Grid -->
+        <div class="stat-grid" id="statGrid">
+            <!-- Stat cards will be dynamically rendered here -->
+        </div>
+
+        <!-- Charts and Insights Grid -->
+        <div class="dashboard-body">
+            <!-- Left Panel: Visual Trends -->
+            <div class="panel">
+                <div class="panel-title">
+                    Behavioral Timelines
+                    <span class="panel-subtitle">Interactive 30-day correlation charts</span>
+                </div>
+                <div class="charts-container">
+                    <div>
+                        <div style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Steps & Exercise Minutes</div>
+                        <div class="chart-wrapper">
+                            <canvas id="activityChart"></canvas>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.5rem;">Sleep Duration & Screen Time</div>
+                        <div class="chart-wrapper">
+                            <canvas id="sleepScreenChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel: Insights -->
+            <div class="panel">
+                <div class="panel-title">
+                    Evidence-Backed Insights
+                    <span class="panel-subtitle" id="insightCount">0 active claims</span>
+                </div>
+                <div class="insights-list" id="insightsList">
+                    <!-- Insight cards will be dynamically rendered here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Panel: Evidence Sufficiency (Abstention Engine summary) -->
+        <div class="sufficiency-panel">
+            <div class="sufficiency-title">
+                <span class="icon">i</span>
+                Evidence Safety Filter (Component 4)
+            </div>
+            <div class="sufficiency-desc">
+                To ensure accuracy, insights with weak evidence (less than 70% confidence) are hidden to prevent false conclusions.
+            </div>
+            <div class="sufficiency-badge" id="sufficiencyStatus">
+                0 insights withheld
+            </div>
+        </div>
+    </main>
+
+    <!-- Embedded JSON Data and Logic -->
+    <script>
+        // Data injected by Python template engine
+        const chronisData = {{ data_json | safe }};
+        const chronisInsights = {{ insights_json | safe }};
+        const abstentionCounts = {{ abstention_counts_json | safe }};
+
+        let activeUser = "";
+        let activityChartObj = null;
+        let sleepScreenChartObj = null;
+
+        // Initialize Dashboard
+        window.addEventListener('DOMContentLoaded', () => {
+            const users = Object.keys(chronisInsights);
+            if (users.length > 0) {
+                renderUserTabs(users);
+                selectUser(users[0]);
+            }
+        });
+
+        function renderUserTabs(users) {
+            const container = document.getElementById('userTabs');
+            container.innerHTML = '';
+            users.forEach(u => {
+                const btn = document.createElement('button');
+                btn.className = `user-tab ${u === activeUser ? 'active' : ''}`;
+                btn.id = `tab-${u}`;
+                btn.onclick = () => selectUser(u);
+                
+                const label = document.createElement('span');
+                label.innerText = `Profile ${u}`;
+                
+                const dot = document.createElement('span');
+                dot.className = 'user-dot';
+                
+                btn.appendChild(label);
+                btn.appendChild(dot);
+                container.appendChild(btn);
+            });
+        }
+
+        function selectUser(userId) {
+            // Update active tab state
+            if (activeUser) {
+                const oldTab = document.getElementById(`tab-${activeUser}`);
+                if (oldTab) oldTab.classList.remove('active');
+            }
+            activeUser = userId;
+            const newTab = document.getElementById(`tab-${userId}`);
+            if (newTab) newTab.classList.add('active');
+
+            // Update Header
+            document.getElementById('dashboardUserTitle').innerText = `Preserved Profile: ${userId}`;
+            
+            // Get User Data
+            const userData = chronisData.filter(d => d.user_id === userId);
+            
+            // Calculate averages
+            const avgSteps = Math.round(userData.reduce((sum, d) => sum + d.steps, 0) / userData.length);
+            const avgSleep = (userData.reduce((sum, d) => sum + d.sleep_hours, 0) / userData.length).toFixed(1);
+            const avgScreen = (userData.reduce((sum, d) => sum + d.screen_time_hours, 0) / userData.length).toFixed(1);
+            const avgWork = (userData.reduce((sum, d) => sum + d.deep_work_hours, 0) / userData.length).toFixed(1);
+            const avgExercise = Math.round(userData.reduce((sum, d) => sum + d.exercise_minutes, 0) / userData.length);
+
+            // Render Stat Cards
+            const statGrid = document.getElementById('statGrid');
+            statGrid.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-label">Daily Steps</div>
+                    <div class="stat-value" style="color: var(--accent-green);">${avgSteps.toLocaleString()}</div>
+                    <div class="stat-desc">Monthly Mean</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Sleep Hours</div>
+                    <div class="stat-value" style="color: var(--accent-cyan);">${avgSleep}h</div>
+                    <div class="stat-desc">Monthly Mean</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Screen Time</div>
+                    <div class="stat-value" style="color: var(--accent-amber);">${avgScreen}h</div>
+                    <div class="stat-desc">Monthly Mean</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Deep Work</div>
+                    <div class="stat-value" style="color: var(--accent-purple);">${avgWork}h</div>
+                    <div class="stat-desc">Monthly Mean</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Daily Exercise</div>
+                    <div class="stat-value" style="color: #a3e635;">${avgExercise}m</div>
+                    <div class="stat-desc">Monthly Mean</div>
+                </div>
+            `;
+
+            // Render Insights List
+            const insightsList = document.getElementById('insightsList');
+            const userInsightsList = chronisInsights[userId] || [];
+            document.getElementById('insightCount').innerText = `${userInsightsList.length} active claims`;
+            
+            insightsList.innerHTML = '';
+            if (userInsightsList.length === 0) {
+                insightsList.innerHTML = `<div class="empty-insights">No strong behavioral claims survived sufficiency analysis for this profile.</div>`;
+            } else {
+                userInsightsList.forEach(ins => {
+                    const card = document.createElement('div');
+                    card.className = 'insight-card';
+                    
+                    let badgeClass = 'badge-trend-incline';
+                    let badgeLabel = 'Trend';
+                    if (ins.type === 'anomaly') {
+                        badgeClass = 'badge-anomaly';
+                        badgeLabel = 'Anomaly';
+                    } else if (ins.metric === 'steps' && ins.details.cohens_d < 0) {
+                        badgeClass = 'badge-trend-decline';
+                    } else if (ins.metric === 'sleep_hours' && ins.details.cohens_d < 0) {
+                        badgeClass = 'badge-trend-decline';
+                    } else if (ins.metric === 'deep_work_hours' && ins.details.cohens_d < 0) {
+                        badgeClass = 'badge-trend-decline';
+                    } else if (ins.metric === 'exercise_minutes' && ins.details.cohens_d < 0) {
+                        badgeClass = 'badge-trend-decline';
+                    }
+                    
+                    card.innerHTML = `
+                        <div class="insight-meta">
+                            <span class="insight-badge ${badgeClass}">${badgeLabel}</span>
+                            <div class="confidence-container">
+                                <span>Confidence</span>
+                                <div class="confidence-bar-bg">
+                                    <div class="confidence-bar-fill" style="width: ${ins.confidence * 100}%;"></div>
+                                </div>
+                                <span style="font-weight: 600;">${Math.round(ins.confidence * 100)}%</span>
+                            </div>
+                        </div>
+                        <div class="insight-title">${ins.insight}</div>
+                        <div class="insight-evidence">${ins.evidence}</div>
+                    `;
+                    insightsList.appendChild(card);
+                });
+            }
+
+            // Update Sufficiency Status
+            const countWithheld = abstentionCounts[userId] || 0;
+            document.getElementById('sufficiencyStatus').innerText = `${countWithheld} insights withheld`;
+
+            // Draw Charts
+            drawCharts(userData);
+        }
+
+        function drawCharts(userData) {
+            const dates = userData.map(d => d.date.split('T')[0]);
+            
+            // 1. Activity Chart (Steps & Exercise)
+            const stepsData = userData.map(d => d.steps);
+            const exerciseData = userData.map(d => d.exercise_minutes);
+
+            if (activityChartObj) {
+                activityChartObj.destroy();
+            }
+
+            const ctxActivity = document.getElementById('activityChart').getContext('2d');
+            activityChartObj = new Chart(ctxActivity, {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [
+                        {
+                            label: 'Daily Steps',
+                            data: stepsData,
+                            borderColor: '#10b981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.05)',
+                            borderWidth: 2,
+                            pointRadius: 3,
+                            yAxisID: 'ySteps',
+                            fill: true,
+                            tension: 0.2
+                        },
+                        {
+                            label: 'Exercise (min)',
+                            data: exerciseData,
+                            borderColor: '#a3e635',
+                            backgroundColor: 'transparent',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            pointRadius: 3,
+                            yAxisID: 'yExercise',
+                            fill: false,
+                            tension: 0.2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(255, 255, 255, 0.03)' },
+                            ticks: { color: '#71717a', font: { size: 9 } }
+                        },
+                        ySteps: {
+                            type: 'linear',
+                            position: 'left',
+                            grid: { color: 'rgba(255, 255, 255, 0.03)' },
+                            ticks: { color: '#10b981', font: { size: 9 } },
+                            title: { display: true, text: 'Steps', color: '#10b981', font: { size: 10 } }
+                        },
+                        yExercise: {
+                            type: 'linear',
+                            position: 'right',
+                            grid: { display: false },
+                            ticks: { color: '#a3e635', font: { size: 9 } },
+                            title: { display: true, text: 'Exercise Minutes', color: '#a3e635', font: { size: 10 } }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: { color: '#f4f4f5', font: { size: 10 } }
+                        }
+                    }
+                }
+            });
+
+            // 2. Sleep & Screen Time Chart
+            const sleepData = userData.map(d => d.sleep_hours);
+            const screenData = userData.map(d => d.screen_time_hours);
+
+            if (sleepScreenChartObj) {
+                sleepScreenChartObj.destroy();
+            }
+
+            const ctxSleep = document.getElementById('sleepScreenChart').getContext('2d');
+            sleepScreenChartObj = new Chart(ctxSleep, {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [
+                        {
+                            label: 'Sleep Hours',
+                            data: sleepData,
+                            borderColor: '#06b6d4',
+                            backgroundColor: 'rgba(6, 182, 212, 0.05)',
+                            borderWidth: 2,
+                            pointRadius: 3,
+                            yAxisID: 'ySleep',
+                            fill: true,
+                            tension: 0.2
+                        },
+                        {
+                            label: 'Screen Time (h)',
+                            data: screenData,
+                            borderColor: '#ef4444',
+                            backgroundColor: 'transparent',
+                            borderWidth: 2,
+                            borderDash: [3, 3],
+                            pointRadius: 3,
+                            yAxisID: 'yScreen',
+                            fill: false,
+                            tension: 0.2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(255, 255, 255, 0.03)' },
+                            ticks: { color: '#71717a', font: { size: 9 } }
+                        },
+                        ySleep: {
+                            type: 'linear',
+                            position: 'left',
+                            grid: { color: 'rgba(255, 255, 255, 0.03)' },
+                            ticks: { color: '#06b6d4', font: { size: 9 } },
+                            title: { display: true, text: 'Sleep Hours', color: '#06b6d4', font: { size: 10 } }
+                        },
+                        yScreen: {
+                            type: 'linear',
+                            position: 'right',
+                            grid: { display: false },
+                            ticks: { color: '#ef4444', font: { size: 9 } },
+                            title: { display: true, text: 'Screen Hours', color: '#ef4444', font: { size: 10 } }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: { color: '#f4f4f5', font: { size: 10 } }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
