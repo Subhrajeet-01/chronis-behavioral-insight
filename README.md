@@ -47,6 +47,7 @@ chronis/
 ├── run.sh                    # Single-command workflow script
 ├── decisions.md              # Mathematical methodology & failure modes
 ├── requirements.txt          # Project dependencies
+└── Readme.md                 # Project Description
 └── .gitignore
 ```
 
