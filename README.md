@@ -1,8 +1,6 @@
 # Chronis Behavioral Insight Engine
 
-The Chronis Behavioral Insight Engine is a long-horizon behavioral analysis system designed to analyze personal metric logs (steps, sleep, screen time, deep work focus, and physical exercise) and generate actionable, evidence-backed insights. 
-
-Built with privacy and precision in mind, the engine isolates profiles, identifies multi-variable correlations, and employs a mathematical **Abstention Engine** to shield users from noisy, false, or premature claims.
+The Chronis Behavioral Insight Engine is a long-horizon behavioral analysis system designed to analyze personal metric logs (steps, sleep, screen time, deep work focus, and physical exercise) and generate actionable, evidence-backed insights.
 
 ---
 
@@ -75,43 +73,6 @@ chmod +x run.sh
 # Execute the workflow using bash
 bash run.sh
 ```
-
-#### On Windows (using PowerShell):
-```powershell
-# Create virtual environment
-python -m venv .venv
-
-# Activate virtual environment
-.venv\Scripts\Activate.ps1
-
-# Install requirements
-pip install -r requirements.txt
-
-# Run the test suite
-python -m pytest tests/ -v
-
-# Run the pipeline
-python main.py --data "Chronis_TaskA_Synthetic_Behavioral_Data_v2-2 (1).csv"
-```
-
-#### On Windows (using Command Prompt):
-```cmd
-:: Create virtual environment
-python -m venv .venv
-
-:: Activate virtual environment
-.venv\Scripts\activate.bat
-
-:: Install requirements
-pip install -r requirements.txt
-
-:: Run the test suite
-python -m pytest tests/ -v
-
-:: Run the pipeline
-python main.py --data "Chronis_TaskA_Synthetic_Behavioral_Data_v2-2 (1).csv"
-```
-
 ---
 
 ## Pipeline Outputs
@@ -119,25 +80,3 @@ python main.py --data "Chronis_TaskA_Synthetic_Behavioral_Data_v2-2 (1).csv"
 Upon a successful run, the engine outputs two summary files in the root workspace directory:
 * **`chronis_report.json`**: Machine-readable JSON output containing parsed profiles, verified patterns, detected anomalies, and withheld statistics.
 * **`chronis_report.html`**: A premium, interactive dashboard showcasing behavioral correlations and dynamic timeline graphs for each profile.
-
-### How to Open the HTML Dashboard
-
-You can open the generated `chronis_report.html` dashboard directly using a terminal command or by using your file browser:
-
-#### Using Command Line:
-*   **Linux**:
-    ```bash
-    xdg-open chronis_report.html
-    ```
-*   **macOS**:
-    ```bash
-    open chronis_report.html
-    ```
-*   **Windows**:
-    ```cmd
-    start chronis_report.html
-    ```
-
-#### Using Graphical Interface (All Platforms):
-*   Double-click the file `chronis_report.html` inside your file browser (Explorer/Finder/Files).
-*   Alternatively, drag and drop the `chronis_report.html` file into any open web browser (Chrome, Firefox, Safari, Edge).
